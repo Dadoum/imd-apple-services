@@ -1,0 +1,16 @@
+{
+	"authors": [
+		"Dadoum"
+	],
+	"description": "A minimal D application.",
+	"license": "proprietary",
+	"name": "imd-apple-services",
+
+	"dependencies": {
+		"slf4d": "~>2.2.0"
+	},
+	"libs": [
+		"CoreFoundation",
+		"kqueue"
+	]
+}
