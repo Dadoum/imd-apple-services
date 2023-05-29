@@ -9,7 +9,11 @@
 	"dependencies": {
 		"slf4d": "~>2.2.0"
 	},
-	"libs": [
+
+	"libs-windows": [
+		"./CoreFoundation"
+	],
+	"libs-linux": [
 		"CoreFoundation",
 		"kqueue"
 	]

@@ -5,6 +5,7 @@ import std.string;
 import slf4d;
 
 import corefoundation;
+import fake.windows_stubs;
 
 extern(C):
 

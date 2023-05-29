@@ -6,15 +6,18 @@ import std.string;
 import slf4d;
 
 import corefoundation;
+import fake.windows_stubs;
 
 __gshared static CFDictionaryRef data;
 
 shared static this() {
     auto dataBytes = cast(ubyte[]) file.read("./data.plist");
-    auto plistData = CFDataCreate(null, dataBytes.ptr, dataBytes.length);
+    auto plistData = CFDataCreate(null, dataBytes.ptr, cast(CFIndex) dataBytes.length);
     scope(exit) CFRelease(plistData);
     data = cast(CFDictionaryRef) CFPropertyListCreateWithData(null, plistData, CFPropertyListMutabilityOptions.kCFPropertyListImmutable, null, null);
 }
+
+bool ITER_93_SHOULD_RETURN_MAC = false;
 
 extern(C):
 
@@ -22,10 +25,11 @@ CFTypeRef IORegistryEntryCreateCFProperty(uint entry, CFStringRef key, CFAllocat
     getLogger().traceF!"IORegistryEntryCreateCFProperty: '%s', length: %d"(key.toString(), CFStringGetLength(key));
     // CFShow(key);
 
-    auto iokit = cast(CFDictionaryRef) CFDictionaryGetValue(data, CFSTR!("iokit"));
-    auto val = CFDictionaryGetValue(iokit, key);
-    // CFShow(val);
-    return val;
+    // auto iokit = cast(CFDictionaryRef) CFDictionaryGetValue(data, CFSTR!("iokit"));
+    // auto val = CFDictionaryGetValue(iokit, key);
+    // return val;
+    ubyte[] dataTest = [0x0];
+    return CFDataCreate(null, dataTest.ptr, cast(CFIndex) dataTest.length);
 }
 
 void IOObjectRelease() {
@@ -53,7 +57,6 @@ uint IOServiceGetMatchingService(uint, CFDictionaryRef matching) {
     return 92;
 }
 
-bool ITER_93_SHOULD_RETURN_MAC = false;
 uint IOServiceGetMatchingServices(uint masterPort, CFDictionaryRef matching, uint *existing) {
     getLogger().trace("IOServiceGetMatchingServices");
     // printf("IOServiceGetMatchingServices called with port: %d matching: \n",

@@ -16,3 +16,4 @@ imd-apple-services-test-*
 *.lst
 cmake-build-*/
 data.plist
+IMDAppleServices

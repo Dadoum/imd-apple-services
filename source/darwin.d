@@ -1,5 +1,7 @@
 module darwin;
 
+import fake.windows_stubs;
+
 alias blkcnt_t = long;
 alias blksize_t = int;
 alias dev_t = int;
@@ -40,8 +42,9 @@ struct darwin_stat
     long[2]     st_qspare;
 }
 
-extern(C) void __memset_chk();
-extern(C) int statfs(const char *path, void* buf);
+version (Windows) {} else {
+    extern(C) int statfs(const char *path, void* buf);
+}
 
 extern(C) int darwin_statfs(const char *path, darwin_stat* buf) {
     import core.sys.posix.sys.stat;
@@ -56,16 +59,16 @@ extern(C) int darwin_statfs(const char *path, darwin_stat* buf) {
         cast(int) statStruct.st_gid,
         cast(int) statStruct.st_rdev,
         cast(int) statStruct.st_atime,
-        cast(int) statStruct.st_atimensec,
+        cast(int) 0, // statStruct.st_atimensec,
         cast(int) statStruct.st_mtime,
-        cast(int) statStruct.st_mtimensec,
+        cast(int) 0, // statStruct.st_mtimensec,
         cast(int) statStruct.st_ctime,
-        cast(int) statStruct.st_ctimensec,
+        cast(int) 0, // statStruct.st_ctimensec,
         0, // statStruct.st_birthtime,
         0, // statStruct.st_birthtimensec,
         statStruct.st_size,
-        statStruct.st_blocks,
-        cast(int) statStruct.st_blksize,
+        0, // statStruct.st_blocks,
+        0, // cast(int) statStruct.st_blksize,
         0, // statStruct.st_flags,
         0, // statStruct.st_gen,
         0, // statStruct.st_lspare,

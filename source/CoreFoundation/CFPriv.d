@@ -24,9 +24,9 @@ const(char)* _CFProcessPath();
 const(char*)* _CFGetProcessPath();
 const(char*)* _CFGetProgname();
 
-void _CFGetUGIDs(uid_t* euid, gid_t* egid);
-uid_t _CFGetEUID();
-uid_t _CFGetEGID();
+// void _CFGetUGIDs(uid_t* euid, gid_t* egid);
+// uid_t _CFGetEUID();
+// uid_t _CFGetEGID();
 
 CFPropertyListRef _CFURLCopyPropertyListRepresentation(CFURLRef url);
 CFURLRef _CFURLCreateFromPropertyListRepresentation(CFAllocatorRef alloc, CFPropertyListRef pListRepresentation);
@@ -284,9 +284,9 @@ Boolean CFLocaleGetLanguageRegionEncodingForLocaleIdentifier(
 
 void _CFCalendarResetCurrent();
 
-CFAbsoluteTime _CFAbsoluteTimeFromFileTimeSpec(timespec ts);
+// CFAbsoluteTime _CFAbsoluteTimeFromFileTimeSpec(timespec ts);
 
-timespec _CFFileTimeSpecFromAbsoluteTime(CFAbsoluteTime at);
+// timespec _CFFileTimeSpecFromAbsoluteTime(CFAbsoluteTime at);
 
 bool _CFPropertyListCreateSingleValue(CFAllocatorRef allocator, CFDataRef data, CFOptionFlags option, CFStringRef keyPath, CFPropertyListRef* value, CFErrorRef* error);
 

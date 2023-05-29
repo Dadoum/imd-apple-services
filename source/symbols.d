@@ -17,8 +17,8 @@ shared static this() {
     symbols = [
         "malloc": &malloc,
         "free": cast(void*) &free,
-        "__memset_chk": cast(void*) &__memset_chk,
-        "__bzero": cast(void*) &bzero,
+        "__memset_chk": cast(void*) &memset,
+        "__bzero": cast(void*) &__bzero_impl,
         "memcpy": cast(void*) &memcpy,
         "arc4random": cast(void*) &arc4randomHook,
 

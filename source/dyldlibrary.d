@@ -1,5 +1,5 @@
 /++
- + Thanks to https://github.com/shinh/maloader/
+ + Thanks? to https://github.com/shinh/maloader/
  +/
 
 module dyldlibrary;
@@ -19,6 +19,7 @@ import path = std.path;
 import std.range;
 import std.string;
 
+import fake.windows_stubs;
 import symbols;
 
 alias cpu_type_t = int;
