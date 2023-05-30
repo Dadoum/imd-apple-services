@@ -6,6 +6,34 @@ import slf4d;
 import corefoundation;
 import dyldlibrary;
 
+alias NACInit_t = extern(C) int function(const void* cert_bytes, int cert_len, ubyte** out_validation_ctx,
+	void **out_request_bytes, int *out_request_len);
+alias NACKeyEstablishment_t = extern(C) int function(void* validation_ctx, void* response_bytes, int response_len);
+alias NACSign_t = extern(C) int function(void* validation_ctx, void* unk_bytes, int unk_len,
+	ubyte** validation_data, int* validation_data_len);
+alias NACFree_t = extern(C) int function(void* ptr);
+alias NACCleanup_t = extern(C) int function(void* ptr);
+
+extern (C) {
+	version (CMake) {
+		int NACInit(NACInit_t func, const void* cert_bytes, int cert_len, ubyte** out_validation_ctx, void **out_request_bytes, int *out_request_len);
+		int NACKeyEstablishment(NACKeyEstablishment_t func, void* validation_ctx, void* response_bytes, int response_len);
+		int NACSign(NACSign_t func, void* validation_ctx, void* unk_bytes, int unk_len, ubyte** validation_data, int* validation_data_len);
+		int NACFree(NACFree_t func, void *ptr);
+		int NACCleanup(NACCleanup_t func, void *ptr);
+	} else {
+		version(Windows) {
+			static assert(false, "Use CMake for Windows support.");
+		}
+
+		int NACInit(NACInit_t func, const void* cert_bytes, int cert_len, ubyte** out_validation_ctx, void **out_request_bytes, int *out_request_len) => func(__traits(parameters)[1..$]);
+		int NACKeyEstablishment(NACKeyEstablishment_t func, void* validation_ctx, void* response_bytes, int response_len) => func(__traits(parameters)[1..$]);
+		int NACSign(NACSign_t func, void* validation_ctx, void* unk_bytes, int unk_len, ubyte** validation_data, int* validation_data_len) => func(__traits(parameters)[1..$]);
+		int NACFree(NACFree_t func, void *ptr) => func(__traits(parameters)[1..$]);
+		int NACCleanup(NACCleanup_t func, void *ptr) => func(__traits(parameters)[1..$]);
+	}
+}
+
 void main(string[] args)
 {
 	import slf4d.default_provider;
@@ -13,16 +41,9 @@ void main(string[] args)
 	configureLoggingProvider(provider);
 
 	DyldLibrary lib = new DyldLibrary("./IMDAppleServices");
-	alias NACInit_t = extern(C) int function(const void* cert_bytes, int cert_len, ubyte** out_validation_ctx,
-		void **out_request_bytes, int *out_request_len);
-	alias NACSubmit_t = extern(C) int function(void* validation_ctx, void* response_bytes, int response_len);
-	alias NACGenerate_t = extern(C) int function(void* validation_ctx, void* unk_bytes, int unk_len,
-		ubyte** validation_data, int* validation_data_len);
-	alias NACFree_t = extern(C) int function(void* ptr);
-	alias NACCleanup_t = extern(C) int function(void* ptr);
 	auto nacInit = cast(NACInit_t) (lib.allocation.ptr + 0xB1DB0);
-	auto nacSubmit = cast(NACSubmit_t) (lib.allocation.ptr + 0xB1DD0);
-	auto nacGenerate = cast(NACGenerate_t) (lib.allocation.ptr + 0xB1DF0);
+	auto nacKeyEstablishment = cast(NACKeyEstablishment_t) (lib.allocation.ptr + 0xB1DD0);
+	auto nacSign = cast(NACSign_t) (lib.allocation.ptr + 0xB1DF0);
 	auto nacFree = cast(NACFree_t) (lib.allocation.ptr + 0xB1E10);
 	auto nacCleanup = cast(NACCleanup_t) (lib.allocation.ptr + 0xB1E30);
 
@@ -43,6 +64,8 @@ void main(string[] args)
 	ubyte* validation_ctx;
 	void* request_bytes;
 	int request_len;
+	// getLogger().debugF!"nacInit: %d"(tchak(dataPtr, cast(int) dataLength, &validation_ctx, &request_bytes, &request_len));
+	import std.traits;
 	getLogger().debugF!"nacInit: %d"(nacInit(dataPtr, cast(int) dataLength, &validation_ctx, &request_bytes, &request_len));
 	scope(exit) nacFree(request_bytes);
 	scope(exit) nacCleanup(validation_ctx);
@@ -72,11 +95,11 @@ void main(string[] args)
 	auto sessionPtr = CFDataGetBytePtr(session);
 	auto sessionLength = CFDataGetLength(session);
 
-	getLogger().debugF!"nacSubmit: %d"(nacSubmit(validation_ctx, cast(void*) sessionPtr, cast(int) sessionLength));
+	getLogger().debugF!"nacSubmit: %d"(nacKeyEstablishment(validation_ctx, cast(void*) sessionPtr, cast(int) sessionLength));
 
 	ubyte* validationPtr;
 	int validationLength;
-	getLogger().debugF!"nacGenerate: %d"(nacGenerate(validation_ctx, null, 0, &validationPtr, &validationLength));
+	getLogger().debugF!"nacSign: %d"(nacSign(validation_ctx, null, 0, &validationPtr, &validationLength));
 	scope(exit) nacFree(validationPtr);
 
 	getLogger().infoF!"validation data: %s"(Base64.encode(validationPtr[0..validationLength]));

@@ -31,12 +31,16 @@ set(CMAKE_SHARED_LIBRARY_CREATE_D_FLAGS "-shared")       # -shared
 set(CMAKE_SHARED_LIBRARY_LINK_D_FLAGS "")         # +s, flag for exe link to use shared lib
 set(CMAKE_SHARED_LIBRARY_RUNTIME_D_FLAG "")       # -rpath
 set(CMAKE_SHARED_LIBRARY_RUNTIME_D_FLAG_SEP "")   # : or empty
+
+
 set(CMAKE_INCLUDE_FLAG_D "-I")       # -I
 set(CMAKE_INCLUDE_FLAG_D_SEP "")     # , or empty
 set(CMAKE_LIBRARY_PATH_FLAG "-L-L")
 set(CMAKE_LIBRARY_PATH_TERMINATOR "")  # for the Digital Mars D compiler the link paths have to be terminated with a "/"
-
 set(CMAKE_LINK_LIBRARY_FLAG "-L-l")
+
+
+
 set(CMAKE_STATIC_LIBRARY_PREFIX "")				#
 set(CMAKE_STATIC_LIBRARY_SUFFIX ".lib")			# lib
 set(CMAKE_SHARED_LIBRARY_PREFIX "")          	#
