@@ -26,11 +26,11 @@ extern (C) {
 			static assert(false, "Use CMake for Windows support.");
 		}
 
-		int NACInit(NACInit_t func, const void* cert_bytes, int cert_len, ubyte** out_validation_ctx, void **out_request_bytes, int *out_request_len) => func(__traits(parameters)[1..$]);
-		int NACKeyEstablishment(NACKeyEstablishment_t func, void* validation_ctx, void* response_bytes, int response_len) => func(__traits(parameters)[1..$]);
-		int NACSign(NACSign_t func, void* validation_ctx, void* unk_bytes, int unk_len, ubyte** validation_data, int* validation_data_len) => func(__traits(parameters)[1..$]);
-		int NACFree(NACFree_t func, void *ptr) => func(__traits(parameters)[1..$]);
-		int NACCleanup(NACCleanup_t func, void *ptr) => func(__traits(parameters)[1..$]);
+		int NACInit(NACInit_t func, const void* cert_bytes, int cert_len, ubyte** out_validation_ctx, void **out_request_bytes, int *out_request_len) { return func(__traits(parameters)[1..$]); }
+		int NACKeyEstablishment(NACKeyEstablishment_t func, void* validation_ctx, void* response_bytes, int response_len) { return func(__traits(parameters)[1..$]); }
+		int NACSign(NACSign_t func, void* validation_ctx, void* unk_bytes, int unk_len, ubyte** validation_data, int* validation_data_len) { return func(__traits(parameters)[1..$]); }
+		int NACFree(NACFree_t func, void *ptr) { return func(__traits(parameters)[1..$]); }
+		int NACCleanup(NACCleanup_t func, void *ptr) { return func(__traits(parameters)[1..$]); }
 	}
 }
 
