@@ -13,6 +13,24 @@ import fake.c;
 import fake.diskarbitration;
 import fake.iokit;
 
+template traceFunctionCall(alias U) {
+    import std.traits;
+    enum functionName = __traits(identifier, U);
+    extern(C) ReturnType!U traceFunctionCall(Parameters!U params) {
+        auto log = getLogger();
+        import std.stdio;
+        log.info("= Entered "~functionName~" =====");
+        stdout.flush();
+        scope(exit) {
+            log.info("= Exitted "~functionName~" =====");
+            stdout.flush();
+        }
+        return U(params);
+    }
+}
+
+static bool kCFBooleanTrue = true;
+
 shared static this() {
     symbols = [
         "malloc": &malloc,
@@ -21,42 +39,45 @@ shared static this() {
         "__bzero": cast(void*) &__bzero_impl,
         "memcpy": cast(void*) &memcpy,
         "arc4random": cast(void*) &arc4randomHook,
+        "statfs$INODE64": cast(void*) &__darwin_statfs64,
 
         "sysctlbyname": cast(void*) &sysctlbyname,
 
-        "kDADiskDescriptionVolumeUUIDKey": cast(void*) &kDADiskDescriptionVolumeUUIDKey,
-        "IORegistryEntryFromPath": cast(void*) &IORegistryEntryFromPath,
-        "IORegistryEntryCreateCFProperty": cast(void*) &IORegistryEntryCreateCFProperty,
-        "IOObjectRelease": cast(void*) &IOObjectRelease,
-        "statfs$INODE64": cast(void*) &__darwin_statfs64,
-        "DASessionCreate": cast(void*) &DASessionCreate,
-        "DADiskCreateFromBSDName": cast(void*) &DADiskCreateFromBSDName,
-        "DADiskCopyDescription": cast(void*) &DADiskCopyDescription,
-        "IOServiceMatching": cast(void*) &IOServiceMatching,
-        "IOServiceGetMatchingService": cast(void*) &IOServiceGetMatchingService,
-        "IOIteratorNext": cast(void*) &IOIteratorNext,
-        "IORegistryEntryGetParentEntry": cast(void*) &IORegistryEntryGetParentEntry,
-        "IOServiceGetMatchingServices": cast(void*) &IOServiceGetMatchingServices,
+        "IORegistryEntryFromPath": cast(void*) &traceFunctionCall!IORegistryEntryFromPath,
+        "IORegistryEntryCreateCFProperty": cast(void*) &traceFunctionCall!IORegistryEntryCreateCFProperty,
+        "IOObjectRelease": cast(void*) &traceFunctionCall!IOObjectRelease,
+        "DASessionCreate": cast(void*) &traceFunctionCall!DASessionCreate,
+        "DADiskCreateFromBSDName": cast(void*) &traceFunctionCall!DADiskCreateFromBSDName,
+        "DADiskCopyDescription": cast(void*) &traceFunctionCall!DADiskCopyDescription,
+        "IOServiceMatching": cast(void*) &traceFunctionCall!IOServiceMatching,
+        "IOServiceGetMatchingService": cast(void*) &traceFunctionCall!IOServiceGetMatchingService,
+        "IOIteratorNext": cast(void*) &traceFunctionCall!IOIteratorNext,
+        "IORegistryEntryGetParentEntry": cast(void*) &traceFunctionCall!IORegistryEntryGetParentEntry,
+        "IOServiceGetMatchingServices": cast(void*) &traceFunctionCall!IOServiceGetMatchingServices,
 
-        "kCFTypeDictionaryKeyCallBacks": cast(void*) &kCFTypeDictionaryKeyCallBacks,
-        "kCFTypeDictionaryValueCallBacks": cast(void*) &kCFTypeDictionaryValueCallBacks,
-        "kCFAllocatorDefault": cast(void*) &kCFAllocatorDefault,
+        "kDADiskDescriptionVolumeUUIDKey": cast(void*) &kDADiskDescriptionVolumeUUIDKey,
+        "kCFTypeDictionaryKeyCallBacks": cast(void*) null,
+        "kCFTypeDictionaryValueCallBacks": cast(void*) null,
         "kCFBooleanTrue": cast(void*) &kCFBooleanTrue,
 
-        "CFDictionarySetValue": cast(void*) &CFDictionarySetValue,
-        "CFGetTypeID": cast(void*) &CFGetTypeID,
-        "CFDataGetLength": cast(void*) &CFDataGetLength,
-        "CFDataGetBytes": cast(void*) &CFDataGetBytes,
-        "CFDictionaryCreateMutable": cast(void*) &CFDictionaryCreateMutable,
-        "CFDictionaryGetValue": cast(void*) &CFDictionaryGetValue,
-        "CFRelease": cast(void*) &CFRelease,
-        "CFGetTypeID": cast(void*) &CFGetTypeID,
-        "CFStringGetTypeID": cast(void*) &CFStringGetTypeID,
-        "CFDataGetTypeID": cast(void*) &CFDataGetTypeID,
-        "CFStringGetLength": cast(void*) &CFStringGetLength,
-        "CFStringGetMaximumSizeForEncoding": cast(void*) &CFStringGetMaximumSizeForEncoding,
-        "CFStringGetCString": cast(void*) &CFStringGetCString,
-        "CFUUIDCreateString": cast(void*) &CFUUIDCreateString, // +/
+        "CFDataGetLength": cast(void*) &traceFunctionCall!CFDataGetLength,
+        "CFDataGetBytes": cast(void*) &traceFunctionCall!CFDataGetBytes,
+        "CFDataGetTypeID": cast(void*) &traceFunctionCall!CFDataGetTypeID,
+
+        "CFDictionaryCreateMutable": cast(void*) &traceFunctionCall!CFDictionaryCreateMutable,
+        "CFDictionaryGetValue": cast(void*) &traceFunctionCall!CFDictionaryGetValue,
+        "CFDictionarySetValue": cast(void*) &traceFunctionCall!CFDictionarySetValue,
+
+        "CFStringGetTypeID": cast(void*) &traceFunctionCall!CFStringGetTypeID,
+        "CFStringGetLength": cast(void*) &traceFunctionCall!CFStringGetLength,
+        "CFStringGetMaximumSizeForEncoding": cast(void*) &traceFunctionCall!CFStringGetMaximumSizeForEncoding,
+        "CFStringGetCString": cast(void*) &traceFunctionCall!CFStringGetCString,
+
+        "CFUUIDCreateString": cast(void*) &traceFunctionCall!CFUUIDCreateString,
+
+        "CFRelease": cast(void*) &traceFunctionCall!CFRelease,
+        "CFGetTypeID": cast(void*) &traceFunctionCall!CFGetTypeID,
+        // +/
     ];
 }
 

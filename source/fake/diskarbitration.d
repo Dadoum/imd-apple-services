@@ -9,41 +9,44 @@ import fake.windows_stubs;
 
 extern(C):
 
-alias kDADiskDescriptionVolumeUUIDKey = CFSTR!"DADiskDescriptionVolumeUUIDKey";
+__gshared auto kDADiskDescriptionVolumeUUIDKey = new String("DADiskDescriptionVolumeUUIDKey");
 
-CFNumberRef DASessionCreate(void *alloc) {
+long DASessionCreate(void *alloc) {
     getLogger().trace("DASessionCreate");
     // Create a CFNumberRef
     // Create a CFNumberRef from 201
-    int value = 201;
-    CFNumberRef value_cf = CFNumberCreate(null, CFNumberType.kCFNumberIntType, &value);
-    return value_cf;
-    // return 201;
+    return 201;
+    // return ;
 }
 
 
-CFNumberRef DADiskCreateFromBSDName(CFAllocatorRef, CFAllocatorRef, char* name) {
+long DADiskCreateFromBSDName(CFAllocatorRef, CFAllocatorRef, char* name) {
     getLogger().traceF!"DADiskCreateFromBSDName: %s"(name.fromStringz());
-    int value = 202;
-    CFNumberRef value_cf = CFNumberCreate(null, CFNumberType.kCFNumberIntType, &value);
-    return value_cf;
+    return 202;
 }
 
 CFDictionaryRef DADiskCopyDescription() {
     getLogger().trace("DADiskCopyDescription");
     // CFDictionaryRef description = CFDictionaryCreate();
     CFMutableDictionaryRef description = CFDictionaryCreateMutable(
-        kCFAllocatorDefault,
+        null,
         0,
-        &kCFCopyStringDictionaryKeyCallBacks,
-        &kCFTypeDictionaryValueCallBacks
+        null,
+        null
     );
 
+    static import std.uuid;
+    import fake.iokit;
     CFDictionaryAddValue(
         description,
         kDADiskDescriptionVolumeUUIDKey,
-        CFUUIDCreate(kCFAllocatorDefault)
+        new UUID(std.uuid.UUID(data["root_disk_uuid"].str().native()))
     );
+    // CFDictionaryAddValue(
+    //     description,
+    //     kDADiskDescriptionVolumeUUIDKey,
+    //     CFUUIDCreate(null)
+    // );
 
     return cast(CFDictionaryRef) description;
 }

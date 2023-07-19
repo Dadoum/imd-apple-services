@@ -169,7 +169,22 @@ class DyldLibrary {
                             default:
                                 break;
                         }
-                        // getLogger().trace(section.segname, " | section name: ", section.sectname);
+                        /+
+                        if (section.sectname[0..10] == "__cfstring") {
+                            struct __builtin_CFString {
+                                int *isa; // point to __CFConstantStringClassReference
+                                int flags;
+                                const char *str;
+                                long length;
+                            }
+                            foreach (ref str; cast(__builtin_CFString[]) allocation[section.addr - minimum..section.addr - minimum + section.size]) {
+                                getLogger().infoF!"%x %s"(&str, cast(string) (allocation.ptr + cast(size_t) str.str)[0..str.length]);
+                                stdout.flush();
+                                import corefoundation;
+                                *(cast(String*) &str) = new String(cast(string) (allocation.ptr + cast(size_t) str.str)[0..str.length]);
+                            }
+                        }
+                        // +/
                     }
 
                     // Protect segment

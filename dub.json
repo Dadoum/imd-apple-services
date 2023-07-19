@@ -7,14 +7,10 @@
 	"name": "imd-apple-services",
 
 	"dependencies": {
-		"slf4d": "~>2.2.0"
-	},
-
-	"libs-windows": [
-		"./CoreFoundation"
-	],
-	"libs-linux": [
-		"CoreFoundation",
-		"kqueue"
-	]
+		"slf4d": "~>2.2.0",
+		"plist-d": {
+			"repository": "git+https://github.com/Dadoum/libplist-d.git",
+			"version": "2f14d9f43889ef8cfe38301fc050ff10b8f38ad6"
+		}
+	}
 }

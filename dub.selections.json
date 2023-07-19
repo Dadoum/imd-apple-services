@@ -1,6 +1,8 @@
 {
 	"fileVersion": 1,
 	"versions": {
+		"dxml": "0.4.3",
+		"plist": "~master",
 		"slf4d": "2.2.0"
 	}
 }

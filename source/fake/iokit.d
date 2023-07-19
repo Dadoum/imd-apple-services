@@ -5,31 +5,43 @@ import std.string;
 
 import slf4d;
 
+import plist;
+
 import corefoundation;
 import fake.windows_stubs;
 
-__gshared static CFDictionaryRef data;
+__gshared static PlistDict data;
 
 shared static this() {
     auto dataBytes = cast(ubyte[]) file.read("./data.plist");
-    auto plistData = CFDataCreate(null, dataBytes.ptr, cast(CFIndex) dataBytes.length);
-    scope(exit) CFRelease(plistData);
-    data = cast(CFDictionaryRef) CFPropertyListCreateWithData(null, plistData, CFPropertyListMutabilityOptions.kCFPropertyListImmutable, null, null);
+    data = Plist.fromMemory(dataBytes).dict();
 }
 
 bool ITER_93_SHOULD_RETURN_MAC = false;
 
 extern(C):
 
-CFTypeRef IORegistryEntryCreateCFProperty(uint entry, CFStringRef key, CFAllocatorRef allocator, uint options) {
-    getLogger().traceF!"IORegistryEntryCreateCFProperty: '%s', length: %d"(key.toString(), CFStringGetLength(key));
-    // CFShow(key);
+struct __builtin_CFString {
+    int *isa; // point to __CFConstantStringClassReference
+    int flags;
+    const char *str;
+    long length;
+}
 
-    // auto iokit = cast(CFDictionaryRef) CFDictionaryGetValue(data, CFSTR!("iokit"));
-    // auto val = CFDictionaryGetValue(iokit, key);
-    // return val;
-    ubyte[] dataTest = [0x0];
-    return CFDataCreate(null, dataTest.ptr, cast(CFIndex) dataTest.length);
+Object IORegistryEntryCreateCFProperty(uint entry, __builtin_CFString* key, CFAllocatorRef allocator, uint options) {
+    auto iokit = data["iokit"].dict();
+    import std.stdio;
+    getLogger().infoF!"IORegistry prop: %s"(cast(string) key.str[0..key.length]);
+    stdout.flush();
+    auto val = iokit[cast(string) key.str[0..key.length]];
+    import plist.c;
+    if (auto data = cast(PlistData) val) {
+        return new Data(data.native());
+    } else if (auto str = cast(PlistString) val) {
+        return new String(str.native());
+    }
+
+    assert(false, "Unrecognized plist type.");
 }
 
 void IOObjectRelease() {
@@ -38,16 +50,16 @@ void IOObjectRelease() {
 
 CFMutableDictionaryRef IOServiceMatching(const char *name) {
     getLogger().traceF!"IOServiceMatching: %s"(name.fromStringz());
-    CFStringRef nameStr = CFStringCreateWithCString(kCFAllocatorDefault, name, CFStringBuiltInEncodings.kCFStringEncodingUTF8);
+    CFStringRef nameStr = CFStringCreateWithCString(null, name, 0);
     // Create a CFMutableDictionaryRef
     CFMutableDictionaryRef matching = CFDictionaryCreateMutable(
-        kCFAllocatorDefault,
+        null,
         0,
-        &kCFTypeDictionaryKeyCallBacks,
-        &kCFTypeDictionaryValueCallBacks
+        null,
+        null
     );
     // Add the name to the dictionary
-    CFDictionaryAddValue(matching, CFSTR!("IOProviderClass"), nameStr);
+    CFDictionaryAddValue(matching, new String("IOProviderClass"), cast(Object) nameStr);
     // Return the dictionary
     return matching;
 }
@@ -62,8 +74,7 @@ uint IOServiceGetMatchingServices(uint masterPort, CFDictionaryRef matching, uin
     // printf("IOServiceGetMatchingServices called with port: %d matching: \n",
     //        masterPort);
     // CFShow(matching);
-    if (CFSTR_CMP(cast(CFStringRef) CFDictionaryGetValue(matching, CFSTR!("IOProviderClass")),
-    CFSTR!("IOEthernetInterface"))) {
+    if (CFSTR_CMP(cast(CFStringRef) CFDictionaryGetValue(matching, new String("IOProviderClass")), new String("IOEthernetInterface"))) {
         // printf("IOServiceGetMatchingServices returning 0\n");
         ITER_93_SHOULD_RETURN_MAC = true;
         *existing = 93;
