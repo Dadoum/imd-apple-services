@@ -6,16 +6,12 @@ import std.string;
 import slf4d;
 
 import plist;
+import plist.types;
 
 import corefoundation;
 import fake.windows_stubs;
 
-__gshared static PlistDict data;
-
-shared static this() {
-    auto dataBytes = cast(ubyte[]) file.read("./data.plist");
-    data = Plist.fromMemory(dataBytes).dict();
-}
+__gshared static PlistElementDict data;
 
 bool ITER_93_SHOULD_RETURN_MAC = false;
 
@@ -29,16 +25,15 @@ struct __builtin_CFString {
 }
 
 Object IORegistryEntryCreateCFProperty(uint entry, __builtin_CFString* key, CFAllocatorRef allocator, uint options) {
-    auto iokit = data["iokit"].dict();
+    auto iokit = cast(PlistElementDict) data["iokit"];
     import std.stdio;
     getLogger().infoF!"IORegistry prop: %s"(cast(string) key.str[0..key.length]);
     stdout.flush();
     auto val = iokit[cast(string) key.str[0..key.length]];
-    import plist.c;
-    if (auto data = cast(PlistData) val) {
-        return new Data(data.native());
-    } else if (auto str = cast(PlistString) val) {
-        return new String(str.native());
+    if (auto data = cast(PlistElementData) val) {
+        return new Data(data.value);
+    } else if (auto str = cast(PlistElementString) val) {
+        return new String(str.value);
     }
 
     assert(false, "Unrecognized plist type.");

@@ -8,13 +8,13 @@ file(GLOB_RECURSE SOURCES "${SOURCE_DIR}*.d")
 
 include(UseDub)
 DubProject_Add(slf4d ~2.1.1)
+FetchContent_Declare(
+    plist_proj
+    GIT_REPOSITORY https://github.com/Dadoum/plist
+    PATCH_COMMAND ${DUB_DIRECTORY}/CMakeTmp/DubToCMake -s plist
+)
+FetchContent_MakeAvailable(plist_proj)
 
-add_executable(imd-apple-services ${SOURCES} source/windows_trampoline.c)
+add_executable(imd-apple-services ${SOURCES})
+target_link_libraries(imd-apple-services PRIVATE slf4d plist)
 target_include_directories(imd-apple-services PUBLIC ${SOURCE_DIR})
-
-target_link_libraries(imd-apple-services PUBLIC slf4d CoreFoundation)
-target_compile_versions(imd-apple-services PUBLIC "CMake")
-
-if (UNIX AND NOT APPLE)
-    target_link_libraries(imd-apple-services PUBLIC kqueue)
-endif()

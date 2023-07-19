@@ -8,9 +8,9 @@
 
 	"dependencies": {
 		"slf4d": "~>2.2.0",
-		"plist-d": {
-			"repository": "git+https://github.com/Dadoum/libplist-d.git",
-			"version": "2f14d9f43889ef8cfe38301fc050ff10b8f38ad6"
+		"plist": {
+			"repository": "git+https://github.com/Dadoum/plist.git",
+			"version": "a425458e2c3d8195c6a9ad68e643f2d823850693"
 		}
 	}
 }

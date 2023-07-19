@@ -7,6 +7,9 @@ import slf4d;
 import corefoundation;
 import fake.windows_stubs;
 
+import plist;
+import plist.types;
+
 extern(C):
 
 __gshared auto kDADiskDescriptionVolumeUUIDKey = new String("DADiskDescriptionVolumeUUIDKey");
@@ -40,7 +43,7 @@ CFDictionaryRef DADiskCopyDescription() {
     CFDictionaryAddValue(
         description,
         kDADiskDescriptionVolumeUUIDKey,
-        new UUID(std.uuid.UUID(data["root_disk_uuid"].str().native()))
+        new UUID(std.uuid.UUID((cast(PlistElementString) data["root_disk_uuid"]).value))
     );
     // CFDictionaryAddValue(
     //     description,
